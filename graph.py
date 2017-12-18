@@ -1,3 +1,4 @@
+
 # The %... is an iPython thing, and is not part of the Python language.
 # In this case we're just telling the plotting library to draw things on
 # the notebook, instead of on a separate window.
@@ -24,7 +25,8 @@ import seaborn as sns #sets up styles and gives us more plotting options
 # General syntax to import specific functions in a library:
 ##from (library) import (specific library function)
 from pandas import DataFrame, read_csv
-
+from sklearn.cluster import KMeans
+from classification import ex_d
 # General syntax to import a library but no functions:
 ##import (library) as (give the library a nickname/alias)
 import matplotlib.pyplot as plt
@@ -32,7 +34,9 @@ import pandas as pd #this is how I usually import pandas
 import sys #only needed to determine Python version number
 import matplotlib #only needed to determine Matplotlib version number
 import re
-import scipy as sc
+
+
+
 
 path= r'/home/aakash/Desktop/MI_2_class_data/Training_data/aa/data_set_IVa_aa_cnt.txt'
 data=pd.read_csv(path,header=None)
@@ -41,6 +45,8 @@ mark=pd.read_csv(path2,header=None)
 
 
 
+
+electrode_list=[32,33,34,36,37,38,42,43,44,45,46,47,50,51,52,54,55,56,59,60,61,62,63,64,68,69,70,72,73,74]
 # converted data txt file in  2-d array
 data_array=[]
 for r in range(0,data.shape[0]-1):
@@ -58,58 +64,69 @@ marker_data=pd.DataFrame(mark_array,columns=['Time','Number'])
 data_value=pd.DataFrame(data_array)
 data_value.columns=array
 
-
-mean=[]
-for r in range (0,marker_data.shape[0]-1):
+print marker_data.shape[0]
+x= marker_data.shape[0]
+#if x%2!=0 :
+mean1=np.empty((30,300,marker_data.shape[0]))
+#mean2=np.empty((118,300,(marker_data.shape[0]+1)/2))
+#else :
+#mean1=np.empty((118,300,marker_data.shape[0]/2))
+#mean2=np.empty((118,300,marker_data.shape[0]/2+1))
+for r in range(marker_data.shape[0]-1):
     x= marker_data.iloc[r,0]
-    mean.append([])
-    for f in range(0,118):
-        summ=0
+    i=-1
+    for f in electrode_list:
+        i+=1
         for d in range(int(x),int(x)+300):
-            summ+=data_value.iloc[d,f]
-        mean[r].append(summ/300.0)
+            #if r%2!=0:conda install scikit-learnprint
+            mean1[i,d-int(x),r]=data_value.iloc[d,f]
+            #else:
+            #    mean2[f,d-int(x),r/2-1]=data_value.iloc[d,f]
+#dp = np.zeros((168,30))
+#x= mean1[2:3,4:5,6:8]
+#print x
 
-mean_data=pd.DataFrame(mean)
-mean_data.columns=array
-mean_data.to_csv(r'/home/aakash/Desktop/MI_2_class_data/Training_data/aa/mean.txt', header=None, index=None, sep=' ', mode='w')
+#for i in range(30):
+#    for j in range(300):
+#            for k in range(168):
+#                dp[k][i] += mean1[i][j][k]
+kmean_object=ex_d(r'/home/aakash/Desktop/MI_2_class_data/Training_data/aa/data_set_IVa_aa_cnt.txt',r'/home/aakash/Desktop/MI_2_class_data/Training_data/aa/data_set_IVa_aa_mrk.txt',168,300,0,1)
+data=kmean_object.wave_let()
+#data is (7*168)*118
+weights=[0.0,0.0,0.0,0.0,0.0,0.5,0.4,0.1]
+kmean_data=np.zeros((168,944/118*30))
+k=np.shape(data)
+print k[0]
+print k[1]
+d=0
+for i in range(0,k[0]):
+    for r in range(0,k[1],8):
+        if r in electrode_list:
+            print r
+            for j in range(0,8):
+                kmean_data[i,d]+=weights[j]*data[i][r+j]
+                d+=1
+print kmean_data
+km = KMeans(n_clusters=2)
+km.fit(kmean_data)
+labels = km.labels_
+print(labels)
+count=0
+for i in range(0,k[0]):
+    if marker_data.iloc[i,1]-labels[i]==1:
+        count+=1
+print "accuracy is"
+print count/float(k[0])*100
+#fs=300
+#x=np.arange(fs)
+#y=[mean1[0,i,0] for i in np.arange(fs)]
+#z=[mean2[0,i,0] for i in np.arange(fs)]
 
-print data_value
 
-
-
-
-
-
-
-
-
-#s=pd.DataFrame(s.str.split('\t'))
-#np.array(s.split('\n'))
-
-'''s=s["data"]
-s.str.split("\n").head(8)
-r=s.shape[0]
-print type(s)
-s=s.values
-t=s.tostring()
-type(t)
-r=s.shape[0]
-s=np.array2string(s)
-
-print t[16]
-array=[]
-
-for p in range(0,r-1):
-
-    array.append( np.char.split(t[r],sep='\t'))
-
-    #array.append( np.array(list(s[r]), dtype=float,split='\t'))
-print array[2]
-'''
-
-'''array=[]
-for r in range(0,s.shape()-1):
-    array.append()
-    b=map(float,b)
-    print b
-'''
+#for k in range (0,30):
+#    y=[mean1[k,i,47] for i in np.arange(fs)]
+#    z=[mean1[k,i,42] for i in np.arange(fs)]
+#    plt.figure()
+#    plt.plot(x,y,label="1")
+#    plt.plot(x,z,label="2")
+#plt.show()
