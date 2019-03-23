@@ -1,11 +1,4 @@
-# -*- coding: utf-8 -*-
-# Authors: Romain Trachel <trachelr@gmail.com>
-#          Alexandre Gramfort <alexandre.gramfort@telecom-paristech.fr>
-#          Alexandre Barachant <alexandre.barachant@gmail.com>
-#          Clemens Brunner <clemens.brunner@gmail.com>
-#          Jean-Remi King <jeanremi.king@gmail.com>
-#
-# License: BSD (3-clause)
+
 
 import copy as cp
 
