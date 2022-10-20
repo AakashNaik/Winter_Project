@@ -42,7 +42,7 @@ channels = ['Fp1', 'AFp1', 'Fpz', 'AFp2', 'Fp2', 'AF7', 'AF3', 'AF4', 'AF8', 'FA
 
 Training_data=r'/home/aakash/Desktop/MI_2_class_data/Training_data/aa/data_set_IVa_aa_cnt.txt'
 markers=r'/home/aakash/Desktop/MI_2_class_data/Training_data/aa/data_set_IVa_aa_mrk.txt'
-
+#adding comment
 signal_array = np.loadtxt(Training_data)     #data taken from data file
 b, a = signal.butter(3, np.array([7, 30])/ 100.00, 'bandpass')
 print signal_array,"done"
